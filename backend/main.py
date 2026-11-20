@@ -16,37 +16,41 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# CORS configuration
+# Environment & CORS configuration
 environment = os.getenv("ENVIRONMENT", "development").lower()
 env_cors = os.getenv("CORS_ORIGINS", "")
 
+default_origins = [
+    "https://quantum-random-password-generator.vercel.app",
+    "https://quantum-password-generator.vercel.app",
+    "https://qrng-qiskit.vercel.app",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:4173",
+    "http://127.0.0.1:4173",
+]
+
 if env_cors:
-    origins = [origin.strip() for origin in env_cors.split(",") if origin.strip()]
-elif environment == "production":
-    # Production explicit origins (prevent wildcard in production)
-    origins = [
-        "https://quantum-password-generator.vercel.app",
-        "https://qrng-qiskit.vercel.app",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:3000",
+    parsed_origins = [
+        origin.strip().rstrip("/")
+        for origin in env_cors.split(",")
+        if origin.strip()
     ]
+    if "*" in parsed_origins:
+        origins = ["*"]
+    else:
+        origins = list(dict.fromkeys(parsed_origins + default_origins))
 else:
-    # Development origins
-    origins = [
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:4173",
-        "http://127.0.0.1:4173",
-    ]
+    origins = default_origins
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"^https:\/\/.*\.vercel\.app$",
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
