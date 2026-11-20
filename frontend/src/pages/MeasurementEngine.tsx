@@ -40,25 +40,14 @@ export const MeasurementEngine: React.FC<MeasurementEngineProps> = ({ isConnecte
   const handleMeasure = async () => {
     setIsLoading(true);
     try {
-      if (isConnected) {
-        const res = await runQuantumMeasurement({
-          theta,
-          phi,
-          apply_h: applyH,
-          apply_x: applyX,
-          shots,
-        });
-        setMeasurementResult(res);
-      } else {
-        const fallback = fallbackMeasurement({
-          theta,
-          phi,
-          apply_h: applyH,
-          apply_x: applyX,
-          shots,
-        });
-        setMeasurementResult(fallback);
-      }
+      const res = await runQuantumMeasurement({
+        theta,
+        phi,
+        apply_h: applyH,
+        apply_x: applyX,
+        shots,
+      });
+      setMeasurementResult(res);
     } catch (err: unknown) {
       console.warn('Measurement API error, using demo fallback:', err);
       const fallback = fallbackMeasurement({
@@ -77,7 +66,7 @@ export const MeasurementEngine: React.FC<MeasurementEngineProps> = ({ isConnecte
   useEffect(() => {
     handleMeasure();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [theta, phi, applyH, applyX]);
+  }, [theta, phi, applyH, applyX, isConnected]);
 
   const handlePresetState = (t: number, p: number, h = false, x = false) => {
     setTheta(t);

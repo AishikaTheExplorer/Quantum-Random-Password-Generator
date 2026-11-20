@@ -50,28 +50,16 @@ export const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({ isConnecte
     setIsLoading(true);
 
     try {
-      if (isConnected) {
-        const data = await generateQuantumPassword({
-          length,
-          uppercase,
-          lowercase,
-          numbers,
-          symbols,
-          count,
-        });
-        setResult(data);
-      } else {
-        // Fallback demo mode
-        const demoData = fallbackPasswordGenerator({
-          length,
-          uppercase,
-          lowercase,
-          numbers,
-          symbols,
-          count,
-        });
-        setResult(demoData);
-      }
+      // Always attempt the live Qiskit Aer backend API first
+      const data = await generateQuantumPassword({
+        length,
+        uppercase,
+        lowercase,
+        numbers,
+        symbols,
+        count,
+      });
+      setResult(data);
     } catch (err: unknown) {
       console.warn('Backend call failed, using demo fallback:', err);
       const demoData = fallbackPasswordGenerator({
@@ -89,10 +77,10 @@ export const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({ isConnecte
   };
 
   useEffect(() => {
-    // Generate initial password on mount
+    // Generate initial password on mount, and re-fetch from Qiskit backend once connection establishes
     handleGenerate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isConnected]);
 
   const handleCopy = (text: string, index: number) => {
     navigator.clipboard.writeText(text);

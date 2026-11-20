@@ -86,21 +86,12 @@ export const CircuitGenerator: React.FC<CircuitGeneratorProps> = ({ isConnected 
     setIsLoading(true);
     setErrorMsg(null);
     try {
-      if (isConnected) {
-        const res = await simulateQuantumCircuit({
-          num_qubits: numQubits,
-          gates: placedGates,
-          shots,
-        });
-        setSimulationResult(res);
-      } else {
-        const fallback = fallbackCircuitSimulate({
-          num_qubits: numQubits,
-          gates: placedGates,
-          shots,
-        });
-        setSimulationResult(fallback);
-      }
+      const res = await simulateQuantumCircuit({
+        num_qubits: numQubits,
+        gates: placedGates,
+        shots,
+      });
+      setSimulationResult(res);
     } catch (err: unknown) {
       console.warn('Simulation error, using demo preview:', err);
       const fallback = fallbackCircuitSimulate({
@@ -117,7 +108,7 @@ export const CircuitGenerator: React.FC<CircuitGeneratorProps> = ({ isConnected 
   useEffect(() => {
     handleCompileAndSimulate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isConnected]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10">
